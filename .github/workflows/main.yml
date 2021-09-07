@@ -42,7 +42,7 @@ jobs:
           context: ./
           file: ./Dockerfile
           push: true
-          tags: ${DOCKER_HUB_USER}/wiredcraft:latest
+          tags: ${{ secrets.DOCKER_HUB_USER }}/wiredcraft:latest
           
       - name: image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
