@@ -46,7 +46,26 @@ jobs:
           
       - name: image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
-
+  deploy:
+    needs: [build]
+    name: deploy app
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.TARGET_HOST_NAME }}
+          username: ${{ secrets.TARGET_HOST_USER }}
+          password: ${{ secrets.TARGET_HOST_PWD }}
+          port: ${{ secrets.TARGET_HOST_PORT }}
+          script: |
+            docker stop $(docker ps --filter ancestor=${{ secrets.DOCKER_REPOSITORY }} -q)
+            docker rm -f $(docker ps -a --filter ancestor=${{ secrets.DOCKER_REPOSITORY }}:latest -q)
+            docker rmi -f $(docker images ${{ secrets.DOCKER_REPOSITORY }}:latest -q)
+            docker login --username {DOCKER_HUB_USER} --password ${DOCKER_HUB_PWD} 
+            docker pull ${{ secrets.DOCKER_REPOSITORY }}:latest
+            docker run -d -p 5000:5000 ${{ secrets.DOCKER_REPOSITORY }}:latest
+          
 #       # Runs a single command using the runners shell
 #       - name: Run a one-line script
 #         run: echo Hello, world!
