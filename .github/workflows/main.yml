@@ -25,9 +25,9 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
       - name: Dump Github context
-        env:
-          GITHUB_CONTEXT: ${{ toJSON(github) }}
-        run: echo "hello ${{ github.event.commits[0].id }}"
+#         env:
+#           GITHUB_CONTEXT: ${{ toJSON(github) }}
+        run: echo "hello ${{ github.sha }}"
 
 #       # Runs a single command using the runners shell
 #       - name: Run a one-line script
