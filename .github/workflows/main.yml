@@ -28,6 +28,24 @@ jobs:
 #         env:
 #           GITHUB_CONTEXT: ${{ toJSON(github) }}
         run: echo "hello ${{ github.sha }}"
+        
+      - name: Login docker hub
+        env:
+          DOCKER_HUB_USER: ${{ secrets.DOCKER_HUB_USER }}
+          DOCKER_HUB_PWD: ${{ secrets.DOCKER_HUB_PWD }}
+        run: |
+          echo "${DOCKER_HUB_PWD}" | docker login --username ${DOCKER_HUB_USER} --password-stdin
+      - name: Build and push
+        id: docker_build
+        uses: docker/build-push-action@v2
+        with:
+          context: ./
+          file: ./Dockerfile
+          push: true
+          tags: ${DOCKER_HUB_USER}/wiredcraft:"${{ github.sha }}"
+          
+      - name: image digest
+        run: echo ${{ steps.docker_build.outputs.digest }}
 
 #       # Runs a single command using the runners shell
 #       - name: Run a one-line script
